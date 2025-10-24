@@ -87,9 +87,70 @@ export class Layout {
       }
     };
 
+    // NOVA LÓGICA: Em vez de preencher renderInfo, geramos filhos inline
+    box.children = this.layoutInlineChildren(node, box);
+    box.renderInfo = undefined; // O texto agora está nos filhos
+
     // Futuro: Lógica recursiva para os filhos do filho
     // for (const child of node.children) { ... }
 
     return box;
+  }
+
+  /**
+   * Gera uma lista de LayoutBoxes para o conteúdo inline de um nó de bloco.
+   * @param parentStyledNode - O nó de estilo do container (ex: o <p>).
+   * @param parentLayoutBox - A caixa de layout já calculada para o container.
+   * @returns Um array de LayoutBoxes inline.
+   */
+  private layoutInlineChildren(parentStyledNode: StyledNode, parentLayoutBox: LayoutBox): LayoutBox[] {
+    const inlineBoxes: LayoutBox[] = [];
+    let currentX = parentLayoutBox.dimensions.x;
+    const currentY = parentLayoutBox.dimensions.y;
+
+    // Precisamos de um mapa para encontrar facilmente o StyledNode de um ElementNode
+    const elementStyleMap = new Map(parentStyledNode.children.map(child => [child.domNode, child]));
+
+    // Iteramos sobre os FILHOS REAIS do DOM (incluindo nós de texto)
+    for (const childDomNode of Array.from(parentStyledNode.domNode.childNodes)) {
+      if (childDomNode.nodeType === Node.TEXT_NODE) {
+        const text = childDomNode.textContent || '';
+        if (text.trim().length === 0) continue; // Ignora nós de texto vazios
+
+        // Nós de texto herdam o estilo do pai (<p>)
+        const style = parentStyledNode.computedStyle;
+        const fontString = `${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`;
+        const metrics = this.measurer.measure(text, fontString);
+
+        inlineBoxes.push({
+          style: style,
+          dimensions: { x: currentX, y: currentY, width: metrics.width, height: style.fontSize },
+          children: [],
+          renderInfo: { text: text, font: fontString }
+        });
+
+        currentX += metrics.width;
+      }
+      else if (childDomNode.nodeType === Node.ELEMENT_NODE) {
+        // Elementos (como <a>) usam seu próprio estilo específico
+        const styledNode = elementStyleMap.get(childDomNode as HTMLElement)!;
+        if (!styledNode) continue;
+
+        const style = styledNode.computedStyle;
+        const text = styledNode.domNode.textContent || '';
+        const fontString = `${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`;
+        const metrics = this.measurer.measure(text, fontString);
+
+        inlineBoxes.push({
+          style: style, // AQUI está o estilo do <a> com a cor azul!
+          dimensions: { x: currentX, y: currentY, width: metrics.width, height: style.fontSize },
+          children: [],
+          renderInfo: { text: text, font: fontString }
+        });
+
+        currentX += metrics.width;
+      }
+    }
+    return inlineBoxes;
   }
 }

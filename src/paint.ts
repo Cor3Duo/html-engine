@@ -20,7 +20,8 @@ export class Painter {
 
     // Desenhar o texto
     if (box.renderInfo?.text && box.renderInfo?.font) {
-      this.ctx.fillStyle = 'black'; // Deveria vir do style
+      // USA A COR DO ESTILO DA CAIXA!
+      this.ctx.fillStyle = box.style.color || 'black';
       this.ctx.font = box.renderInfo.font;
       this.ctx.textBaseline = 'top';
       this.ctx.fillText(box.renderInfo.text, box.dimensions.x, box.dimensions.y);
