@@ -16,12 +16,15 @@ export interface LayoutBox {
   renderInfo?: {
     text?: string;
     font?: string;
+    // Adicionamos um lugar para as métricas detalhadas da fonte
+    fontMetrics?: TextMetrics;
   }
 }
 
-// Interface para um medidor, abstraindo o canvas (DIP)
+// 2. ATUALIZAR A ABSTRAÇÃO DO MEDIDOR
 interface TextMeasurer {
-  measure(text: string, font: string): { width: number };
+  // Agora ele retorna o objeto TextMetrics completo
+  measure(text: string, font: string): TextMetrics;
 }
 
 // --- LÓGICA DE LAYOUT ---
@@ -84,7 +87,7 @@ export class Layout {
       renderInfo: {
         text: node.domNode.textContent || '',
         font: fontString,
-      }
+      },
     };
 
     // NOVA LÓGICA: Em vez de preencher renderInfo, geramos filhos inline
@@ -126,7 +129,7 @@ export class Layout {
           style: style,
           dimensions: { x: currentX, y: currentY, width: metrics.width, height: style.fontSize },
           children: [],
-          renderInfo: { text: text, font: fontString }
+          renderInfo: { text: text, font: fontString, fontMetrics: metrics } // Armazena aqui!
         });
 
         currentX += metrics.width;
@@ -145,7 +148,7 @@ export class Layout {
           style: style, // AQUI está o estilo do <a> com a cor azul!
           dimensions: { x: currentX, y: currentY, width: metrics.width, height: style.fontSize },
           children: [],
-          renderInfo: { text: text, font: fontString }
+          renderInfo: { text: text, font: fontString, fontMetrics: metrics } // Armazena aqui!
         });
 
         currentX += metrics.width;

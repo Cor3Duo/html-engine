@@ -12,6 +12,7 @@ export interface ComputedStyle {
   marginBottom: number;
   marginLeft: number;
   color: string;
+  textDecoration: string;
 }
 
 // Nó do DOM com seu estilo computado anexado
@@ -24,10 +25,10 @@ export interface StyledNode {
 // --- BANCO DE DADOS DE ESTILOS PADRÃO (USER-AGENT STYLESHEET) ---
 // Agora com uma estrutura mais robusta para os valores
 const defaultStyles: { [key: string]: any } = {
-  html: { fontSize: '16px', fontFamily: 'Times New Roman', color: 'black' },
+  html: { fontSize: '16px', fontFamily: 'Times New Roman', color: 'black', textDecoration: 'none' },
   body: { display: 'block', marginTop: '8px', marginRight: '8px', marginBottom: '8px', marginLeft: '8px', fontSize: '1em' },
-  h1: { display: 'block', fontSize: '2em', marginTop: '0.67em', marginBottom: '0.67em', fontWeight: 'bold' },
-  p: { display: 'block', fontSize: '1em', marginTop: '1em', marginBottom: '1em', fontWeight: 'normal' },
+  h1: { display: 'block', fontSize: '2em', marginTop: '0.67em', marginBottom: '0.67em', fontWeight: 'bold', textDecoration: 'none' },
+  p: { display: 'block', fontSize: '1em', marginTop: '1em', marginBottom: '1em', fontWeight: 'normal', textDecoration: 'none' },
   a: { display: 'inline', color: 'blue', textDecoration: 'underline' },
 };
 
@@ -45,6 +46,7 @@ export function buildStyleTree(domRoot: HTMLElement): StyledNode {
     fontWeight: 'normal',
     marginTop: 0, marginRight: 0, marginBottom: 0, marginLeft: 0,
     color: 'black',
+    textDecoration: 'none',
   };
 
   function computeNodeStyle(domNode: HTMLElement, parentStyle: ComputedStyle): StyledNode {
@@ -68,6 +70,7 @@ function getComputedStyle(specifiedStyle: any, parentStyle: ComputedStyle): Comp
   };
 
   computed.color = specifiedStyle.color || parentStyle.color;
+  computed.textDecoration = specifiedStyle.textDecoration || 'none';
 
   // Lógica de computação de unidades
   const parentFontSize = parentStyle.fontSize;

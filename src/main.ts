@@ -4,9 +4,8 @@ import { Painter } from './paint';
 
 // --- SETUP ---
 const cvs = document.createElement('canvas');
-cvs.width = 600;
-cvs.height = 600;
-cvs.style.border = '1px solid #000';
+cvs.width = innerWidth;
+cvs.height = innerHeight;
 document.body.appendChild(cvs);
 const ctx = cvs.getContext('2d')!;
 
@@ -21,7 +20,7 @@ const html = `<!DOCTYPE html>
   <body>
     <h1>Example Domain</h1>
     <p>This domain is for use in documentation examples without needing permission. Avoid use in operations.</p>
-    <p><a href="https://iana.org/domains/example">Learn more</a></p>
+    <p><a href="https://iana.org/domains/example">Learn moregk</a></p>
   </body>
 </html>`;
 const dom = new DOMParser().parseFromString(html, 'text/html');
@@ -33,8 +32,9 @@ const styledTree = buildStyleTree(dom.body);
 console.log("Style Tree:", styledTree);
 
 // 2. Fase de Layout: Style Tree -> Layout Tree
-//    Injeção de Dependência: passamos o `ctx` como um "medidor" para o Layout.
 const layoutEngine = new Layout({ 
+  // Nenhuma mudança funcional necessária aqui, pois ctx.measureText já retorna o objeto completo.
+  // Apenas garantimos que nossa tipagem e lógica estejam alinhadas.
   measure: (text, font) => {
     ctx.font = font;
     return ctx.measureText(text);
